@@ -217,7 +217,7 @@ export const invoiceBackend = {
   updateInvoice: async (
     invoiceId: string,
     workspaceId: string,
-    updates: Partial<Invoice>
+    updates: Partial<Omit<Invoice, "vendor" | "lines" | "matches">>
   ) => {
     const { data, error } = await supabaseAdmin
       .from("invoices")

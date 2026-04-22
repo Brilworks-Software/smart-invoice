@@ -156,7 +156,7 @@ export const paymentBackend = {
     workspaceId: string,
     paymentData: Omit<
       Payment,
-      "id" | "workspace_id" | "created_at" | "updated_at"
+      "id" | "workspace_id" | "created_at" | "updated_at" | "matches"
     >
   ) => {
     const { data, error } = await supabaseAdmin
@@ -176,7 +176,7 @@ export const paymentBackend = {
   updatePayment: async (
     paymentId: string,
     workspaceId: string,
-    updates: Partial<Payment>
+    updates: Partial<Omit<Payment, "matches">>
   ) => {
     const { data, error } = await supabaseAdmin
       .from("payments")
