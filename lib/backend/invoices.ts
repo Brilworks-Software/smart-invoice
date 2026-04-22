@@ -14,7 +14,7 @@ export const invoiceBackend = {
       invoice_type?: "receivable" | "payable";
       page?: number;
       pageSize?: number;
-    }
+    },
   ) => {
     const page = filters?.page || 1;
     const pageSize = filters?.pageSize || 10;
@@ -33,7 +33,7 @@ export const invoiceBackend = {
           payment:payments(*)
         )
       `,
-        { count: "exact" }
+        { count: "exact" },
       )
       .eq("workspace_id", workspaceId)
       .order("created_at", { ascending: false })
@@ -74,7 +74,7 @@ export const invoiceBackend = {
           *,
           payment:payments(*)
         )
-      `
+      `,
       )
       .eq("id", invoiceId)
       .eq("workspace_id", workspaceId)
@@ -94,7 +94,7 @@ export const invoiceBackend = {
     confidence: number = 0.8,
     invoiceType: "receivable" | "payable" = "payable",
     tempFilePath?: string | null,
-    mimeType?: string
+    mimeType?: string,
   ) => {
     // Check if invoice with same workspace_id, vendor_id, and invoice_no already exists
     const { data: existingInvoice, error: checkError } = await supabaseAdmin
@@ -113,7 +113,7 @@ export const invoiceBackend = {
     if (existingInvoice) {
       // Invoice already exists - return existing invoice with a clear error message
       const error = new Error(
-        `Invoice number "${extraction.invoice_number}" already exists for this vendor in this workspace.`
+        `Invoice number "${extraction.invoice_number}" already exists for this vendor in this workspace.`,
       ) as any;
       error.code = "DUPLICATE_INVOICE";
       error.existingInvoice = existingInvoice;
@@ -150,7 +150,7 @@ export const invoiceBackend = {
         invoiceError.message?.includes("unique constraint")
       ) {
         const error = new Error(
-          `Invoice number "${extraction.invoice_number}" already exists for this vendor in this workspace.`
+          `Invoice number "${extraction.invoice_number}" already exists for this vendor in this workspace.`,
         ) as any;
         error.code = "DUPLICATE_INVOICE";
         throw error;
@@ -217,7 +217,7 @@ export const invoiceBackend = {
   updateInvoice: async (
     invoiceId: string,
     workspaceId: string,
-    updates: Partial<Invoice>
+    updates: Partial<Omit<Invoice, "vendor" | "lines" | "matches">>,
   ) => {
     const { data, error } = await supabaseAdmin
       .from("invoices")

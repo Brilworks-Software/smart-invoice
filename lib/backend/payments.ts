@@ -9,7 +9,7 @@ import type {
 // Helper function to update invoice status based on payment matches
 async function updateInvoiceStatusFromMatches(
   workspaceId: string,
-  invoiceId: string
+  invoiceId: string,
 ) {
   // Get invoice with all matches
   const { data: invoice, error: invoiceError } = await supabaseAdmin
@@ -21,7 +21,7 @@ async function updateInvoiceStatusFromMatches(
         *,
         payment:payments(*)
       )
-    `
+    `,
     )
     .eq("id", invoiceId)
     .eq("workspace_id", workspaceId)
@@ -40,7 +40,7 @@ async function updateInvoiceStatusFromMatches(
       }
       return sum;
     },
-    0
+    0,
   );
 
   const invoiceTotal = invoice.total || 0;
@@ -65,7 +65,7 @@ async function updateInvoiceStatusFromMatches(
       console.error("Error updating invoice status:", updateError);
     } else {
       console.log(
-        `Updated invoice ${invoiceId} status from ${invoice.status} to ${newStatus}`
+        `Updated invoice ${invoiceId} status from ${invoice.status} to ${newStatus}`,
       );
     }
   }
@@ -82,7 +82,7 @@ export const paymentBackend = {
       date_to?: string;
       page?: number;
       pageSize?: number;
-    }
+    },
   ) => {
     const page = filters?.page || 1;
     const pageSize = filters?.pageSize || 10;
@@ -102,7 +102,7 @@ export const paymentBackend = {
           )
         )
       `,
-        { count: "exact" }
+        { count: "exact" },
       )
       .eq("workspace_id", workspaceId)
       .order("received_at", { ascending: false })
@@ -141,7 +141,7 @@ export const paymentBackend = {
             vendor:vendors(*)
           )
         )
-      `
+      `,
       )
       .eq("id", paymentId)
       .eq("workspace_id", workspaceId)
@@ -156,8 +156,8 @@ export const paymentBackend = {
     workspaceId: string,
     paymentData: Omit<
       Payment,
-      "id" | "workspace_id" | "created_at" | "updated_at"
-    >
+      "id" | "workspace_id" | "created_at" | "updated_at" | "matches"
+    >,
   ) => {
     const { data, error } = await supabaseAdmin
       .from("payments")
@@ -176,7 +176,7 @@ export const paymentBackend = {
   updatePayment: async (
     paymentId: string,
     workspaceId: string,
-    updates: Partial<Payment>
+    updates: Partial<Omit<Payment, "matches">>,
   ) => {
     const { data, error } = await supabaseAdmin
       .from("payments")
@@ -197,7 +197,7 @@ export const paymentBackend = {
     paymentId: string,
     score: number,
     method: "auto" | "manual",
-    reason?: string
+    reason?: string,
   ) => {
     const { data, error } = await supabaseAdmin
       .from("payment_matches")
@@ -228,7 +228,7 @@ export const paymentBackend = {
       invoice_id?: string;
       score?: number;
       reason?: string;
-    }
+    },
   ) => {
     const { data, error } = await supabaseAdmin
       .from("payment_matches")
@@ -279,7 +279,7 @@ export const paymentBackend = {
             vendor:vendors(*)
           )
         )
-      `
+      `,
       )
       .eq("workspace_id", workspaceId)
       .order("received_at", { ascending: false });
@@ -290,7 +290,7 @@ export const paymentBackend = {
 
     // Filter out payments that have matches
     const unmatchedPayments = (allPayments || []).filter(
-      (payment) => !matchedPaymentIds.includes(payment.id)
+      (payment) => !matchedPaymentIds.includes(payment.id),
     );
 
     return unmatchedPayments as Payment[];
@@ -325,7 +325,7 @@ export const paymentBackend = {
             vendor:vendors(*)
           )
         )
-      `
+      `,
       )
       .eq("workspace_id", workspaceId)
       .in("id", matchedPaymentIds)
@@ -361,7 +361,7 @@ export const paymentBackend = {
         invoice,
         score, // Store as 0-1 decimal (e.g., 0.9831 for 98.31%)
         reason: `Amount within ${((amountDiff / payment.amount) * 100).toFixed(
-          1
+          1,
         )}%`,
       };
     });
